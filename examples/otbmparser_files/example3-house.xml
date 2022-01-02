@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<houses>
+	<house name="House_1" houseid="1" entryx="1014" entryy="1021" entryz="7" rent="0" townid="1" size="5" />
+</houses>
