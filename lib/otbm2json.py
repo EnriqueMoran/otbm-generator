@@ -7,12 +7,7 @@ from functools import partial
 from pathlib import Path
 
 
-__author__ = "EnriqueMoran"
-
-__version__ = "v0.1"
-
-
-class OTBMParser:
+class Otbm2Json:
     """
     OTBM to Json parser.
     """
@@ -24,7 +19,8 @@ class OTBMParser:
     ITEMS_MINOR_VERSION = 4
 
     def __init__(self):
-        self._file_path = None
+        self._otbm_file_path = None    # Input file
+        self._json_file_path = None    # Output file
         self._json_data = defaultdict(list)
         self._node_list = list()
 
@@ -39,15 +35,26 @@ class OTBMParser:
         self._description_cnt = 0
 
     @property
-    def file_path(self):
-        return self._file_path
+    def otbm_file_path(self):
+        return self._otbm_file_path
 
-    @file_path.setter
-    def file_path(self, value):
+    @otbm_file_path.setter
+    def otbm_file_path(self, value):
         new_path = Path(value)
         assert new_path.is_file(), "File not found!"
         assert new_path.suffix == ".otbm", "Wrong file format!"
-        self._file_path = new_path
+        self._otbm_file_path = new_path
+
+    @property
+    def json_file_path(self):
+        return self._json_file_path
+
+    @json_file_path.setter
+    def json_file_path(self, value):
+        new_path = Path(value)
+        assert new_path.is_file(), "File not found!"
+        assert new_path.suffix == ".json", "Wrong file format!"
+        self._json_file_path = new_path
 
     def _merge_nodes(self, a_node, b_node):
         """
@@ -462,17 +469,17 @@ class OTBMParser:
 
 
     def process_file(self):
-        with open(self.file_path, 'rb') as file:
+        with open(self.otbm_file_path, 'rb') as file:
             data_iterator = iter(partial(file.read1, 1), bytes())
             self._get_identifier(data_iterator)
             self._get_otbm_header(data_iterator)
             self._get_next_node(data_iterator)
 
 
-    def generate_json(self, output_file):
+    def generate_json(self):
         """
         Create output json file with otbm data.
         """
-        os.makedirs(os.path.dirname(output_file), exist_ok=True)
-        with open(output_file, 'w+', encoding='utf-8') as f:
+        os.makedirs(os.path.dirname(self._json_file_path), exist_ok=True)
+        with open(self._json_file_path, 'w+', encoding='utf-8') as f:
             json.dump(self._json_data, f, ensure_ascii=False, indent=4)
